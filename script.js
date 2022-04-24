@@ -1,20 +1,32 @@
 const content1 = document.querySelector(".content1");
-const stop = document.getElementById("stop");
-const continued = document.getElementById("continue");
+const content2 = document.querySelector(".content2");
+const buton = document.getElementById("buton");
 
 var interval;
+var afterStopInterval;
 var settings = {
   duration: "1000",
-  random: false,
+  sec: 0,
+  min: 0,
+  hr: 0,
 };
 init(settings);
-
 const formatControl = () => {
   seconds < 10 ? (seconds = `0${seconds}`) : (seconds = seconds);
   minutes < 10 ? (minutes = `0${minutes}`) : (minutes = minutes);
   hours < 10 ? (hours = `0${hours}`) : (hours = hours);
   day < 10 ? (day = `0${day}`) : (day = day);
   month < 10 ? (month = `0${month}`) : (month = month);
+};
+const lostTimeFormatControl = () => {
+  if (settings.sec > 60) {
+    settings.sec = 0;
+    settings.min++;
+  }
+  if (settings.min > 60) {
+    settings.min = 0;
+    settings.hr++;
+  }
 };
 const dates = () => {
   date = new Date();
@@ -30,21 +42,32 @@ const realTime = () => {
   formatControl();
   content1.innerHTML = `${day}.${month}.${year} - ${hours}:${minutes}:${seconds}`;
 };
-const myinterval = () => {
-  setInterval(() => {
-    realTime();
-  }, 1000);
-};
-
 function init(settings) {
   interval = setInterval(function () {
     realTime();
   }, settings.duration);
 }
-
-stop.addEventListener("click" , () => {
-  clearInterval(interval)
-})
-continued.addEventListener("click" , () => {
-  init(settings)
-})
+function afterStop(settings) {
+  afterStopInterval = setInterval(function () {
+    settings.sec++;
+    lostTimeFormatControl();
+    content2.innerHTML = `lost time  ${settings.hr}:${settings.min}:${settings.sec}`;
+  }, settings.duration);
+}
+const buttonEffect = () => {
+  buton.classList.toggle("active");
+};
+buton.addEventListener("click", () => {
+  buttonEffect();
+  if (buton.classList.contains("stop")) {
+    clearInterval(interval);
+    afterStop(settings);
+    buton.textContent = "Continue";
+    buton.classList.toggle("stop");
+    buton.classList.toggle("continue");
+  } else if (buton.classList.contains("continue")) {
+    init(settings);
+    clearInterval(afterStopInterval);
+    buton.textContent = "stop";
+  }
+});
