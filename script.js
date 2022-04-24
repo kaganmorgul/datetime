@@ -1,4 +1,13 @@
 const content1 = document.querySelector(".content1");
+const stop = document.getElementById("stop");
+const continued = document.getElementById("continue");
+
+var interval;
+var settings = {
+  duration: "1000",
+  random: false,
+};
+init(settings);
 
 const formatControl = () => {
   seconds < 10 ? (seconds = `0${seconds}`) : (seconds = seconds);
@@ -16,16 +25,26 @@ const dates = () => {
   minutes = date.getMinutes();
   seconds = date.getSeconds();
 };
-const  realTime = () => {
+const realTime = () => {
   dates();
   formatControl();
   content1.innerHTML = `${day}.${month}.${year} - ${hours}:${minutes}:${seconds}`;
 };
-const myinterval = () =>{
-    setInterval(() => {
-        realTime();
-    },1000)
+const myinterval = () => {
+  setInterval(() => {
+    realTime();
+  }, 1000);
+};
+
+function init(settings) {
+  interval = setInterval(function () {
+    realTime();
+  }, settings.duration);
 }
-myinterval();
 
-
+stop.addEventListener("click" , () => {
+  clearInterval(interval)
+})
+continued.addEventListener("click" , () => {
+  init(settings)
+})
